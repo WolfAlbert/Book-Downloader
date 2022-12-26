@@ -9,6 +9,7 @@ from tkinter import scrolledtext
 import tkinter.ttk as ttk
 import BackEndOfBookDownloader
 import threading
+import tkinter.font as tkFont
 txt = ""
 txtPath = ""
 thrBE = ""
@@ -18,21 +19,11 @@ window = Tk()
 window.title("Book downloader")
 window.iconbitmap(r'Book.ico')
 window.geometry('300x300')
-window.resizable(False, False)
+# window.resizable(False, False)
 tab_control = ttk.Notebook(window)
 tab_control.pack(expand=1, fill='both')
 
-# Создание 2-x вкладок меню
-home = ttk.Frame(tab_control)
-settings = ttk.Frame(tab_control)
 
-tab_control.add(home, text='Главная')
-tab_control.add(settings, text='Настройки')
-
-chkState = IntVar()
-chkState.set(1)
-chk = Checkbutton(settings, text='Нумерация книг', variable=chkState)
-chk.place(x=150, y=30)
 
 
 def InsertText(Txt):
@@ -40,10 +31,6 @@ def InsertText(Txt):
     txt.config(state="normal")
     txt.insert(INSERT, f"{Txt}\n")
     txt.config(state="disabled")
-
-
-def a():
-    print(chkState.get())
 
 
 def Progarmm():
@@ -57,6 +44,10 @@ def Progarmm():
     # Функция Дефокуса, позваляет убрать выделение(фокус)
     def defocus(event):
         event.widget.master.focus_set()
+
+
+    def bookmarksDefocus(event):
+        event.widget.focus_set()
 
 
     def StopDownload():
@@ -172,11 +163,19 @@ def Progarmm():
 
                 btnStart.place(x=195, y=105)
 
+    # Навигация
+    home = ttk.Frame(tab_control)
+    settings = ttk.Frame(tab_control)
+    help = ttk.Frame(tab_control)
 
-    # Обьявляю переменную которая помогает создать вкладки меню
+    tab_control.add(home, text='Главная')
+    tab_control.add(settings, text='Настройки')
+    tab_control.add(help, text='Помощь')
 
-
-    # Вкладка Главная
+    chkState = IntVar()
+    chkState.set(1)
+    chk = Checkbutton(settings, text='Нумерация книг', variable=chkState)
+    chk.place(x=150, y=30)
 
     # Создание и расположение текста
     lblAudio = Label(home, text="Канал для скачивания книг:", font=("Arial Bold", 11))
@@ -204,39 +203,45 @@ def Progarmm():
     spinNum.place(x=23, y=95)
 
 
-    # Текст
+    # Выбор языка
     lblLanguage = Label(settings, text="Язык:", font=("Arial Bold", 10))
     lblLanguage.place(x=23, y=5)
 
-    # Переменная для выбора варианта
     R = tkinter.IntVar()
     R.set(1)
 
-    # Два RadioButton
     Rus = Radiobutton(settings, text='Русский', value=1, variable=R)
     Eng = Radiobutton(settings, text='English', value=2, variable=R)
     Rus.place(x=20, y=30)
     Eng.place(x=20, y=50)
 
-    # Бинд на дефокус
-    Rus.bind("<FocusIn>", defocus)
-    Eng.bind("<FocusIn>", defocus)
-    chk.bind("<FocusIn>", defocus)
-    chk.bind(a)
-    comboAudio.bind("<FocusIn>", defocus)
-    # Текст
+
+
+    # Папка для загрузки книг
     lblPath = Label(settings, text="Папка для загрузки книг:", font=("Arial Bold", 10))
     lblPath.place(x=20, y=80)
 
-    # Виджет который создает текстовое поле в настройках
     txtPath = Entry(settings, width=30)
     txtPath.place(x=20, y=100)
 
+    btnSerachPath = Button(settings, text="Найти", command=SearchPath)
+    btnSerachPath.place(x=203, y=97)
+
+
+    # Сортировка книг
     lblSort = Label(settings, text="Сортировка:", font=("Arial Bold", 10))
     lblSort.place(x=153, y=5)
 
-    btnSerachPath = Button(settings, text="Найти", command=SearchPath)
-    btnSerachPath.place(x=203, y=97)
+    howToUsePogram = Text(help, width=34, height=15)
+    howToUsePogram.insert("1.0", "Программа предназначена для\nскачивания книг с YouTube. Для\nначала"
+                                      " использования программы в\nнастройках нужно указать путь для\nзагрузки книг. "
+                                      "После этого нужно\nперейти на вкладку Главная.\nИ выбрать канал с которого будут\n"
+                                      "скачиваться книги потом нажать\nкнопку Старт.Книги с выбранного\nвами канала "
+                                      "начнут автоматически\nзагружаться в вашу папку\nв формате mp3.\n\n"
+                                 "Версия 1.0\n"
+                                 "Автор ayvazyan.alberto@gmail.com")
+    howToUsePogram.place(x=10, y=10)
+    howToUsePogram.config(state="disabled")
 
     btnStart = Button(home, text="Старт", command=Start)
     btnStart.place(x=175, y=105)
@@ -244,5 +249,18 @@ def Progarmm():
     btnProceed = Button(home, text="Продолжить", command=Proceed)
     btnStop = Button(home, text="Остановить", command=Stop)
     btnStopDownload = Button(home, text="Стоп", command=StopDownload)
+
+
+
+
+    Rus.bind("<FocusIn>", defocus)
+    Eng.bind("<FocusIn>", defocus)
+    chk.bind("<FocusIn>", defocus)
+    comboAudio.bind("<FocusIn>", defocus)
+
+    home.bind("<FocusIn>", bookmarksDefocus)
+    settings.bind("<FocusIn>", bookmarksDefocus)
+    help.bind("<FocusIn>", bookmarksDefocus)
+
 
     window.mainloop()
